@@ -83,11 +83,19 @@ function Deck({ venues }: { venues: Venue[] }) {
     const dx = e.clientX - startRef.current.x;
     const dy = e.clientY - startRef.current.y;
     if (lockedRef.current == null) {
-      if (Math.abs(dx) > 6 || Math.abs(dy) > 6) {
-        lockedRef.current = Math.abs(dx) > Math.abs(dy) ? "swipe" : "ignore";
-        if (lockedRef.current === "swipe") {
-          (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
-        }
+      const adx = Math.abs(dx);
+      const ady = Math.abs(dy);
+      // Wait for one axis to clearly dominate before locking. The old
+      // "lock on first 6px crossing to whichever is bigger" logic
+      // poisoned natural thumb-arc swipes into "ignore" forever the
+      // moment dy briefly led at the start. Now horizontal locks fast
+      // (low threshold, mild dominance) while vertical only locks on a
+      // clearer, larger commit — so brief jitters don't kill the swipe.
+      if (adx > 8 && adx > ady * 1.1) {
+        lockedRef.current = "swipe";
+        (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+      } else if (ady > 14 && ady > adx * 1.4) {
+        lockedRef.current = "ignore";
       }
     }
     if (lockedRef.current === "swipe") {
