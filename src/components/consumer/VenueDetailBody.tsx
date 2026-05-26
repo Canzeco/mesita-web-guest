@@ -18,7 +18,7 @@ import {
   Users,
   Bookmark,
   Clock,
-  Settings,
+  Tags,
   Link2,
   Car,
   Phone,
@@ -826,7 +826,7 @@ function DetailsBox({ venue }: { venue: VenueDetail }) {
     ["Service", venue.details.service_options.join(" · ")],
   ];
   return (
-    <Box title="Details" icon={Settings} iconColor="text-pink-400">
+    <Box title="Details" icon={Tags} iconColor="text-pink-400">
       <dl className="flex flex-col gap-3">
         {rows.map(([label, value]) => (
           <div
