@@ -620,11 +620,9 @@ function HoursTableCard({ venue }: { venue: VenueDetail }) {
 // Welcome card lives outside this constant and always renders first; the
 // tier order below is descending (highest reward → lowest) so users see
 // the aspirational tier next to Welcome.
-const TIER_ORDER: Tier[] = ["diamond", "gold", "silver", "bronze"];
-// Tier index — higher number = higher tier. Used to derive whether
-// a card sits above, at, or below the user's current tier so the
-// hover overlay can hide the "Join" CTA on tiers you've already
-// surpassed.
+// Ascending — Bronze on the left, Diamond on the right, like a ladder
+// you climb. Welcome sits as its own large card above the row.
+const TIER_ORDER: Tier[] = ["bronze", "silver", "gold", "diamond"];
 const TIER_RANK: Record<Tier, number> = {
   bronze: 0,
   silver: 1,
@@ -649,8 +647,8 @@ function RewardsBox({ venue }: { venue: VenueDetail }) {
       iconColor="text-pink-400"
       right={venue.details.mechanic}
     >
-      <div className="scrollbar-hide -mx-4 flex snap-x snap-mandatory gap-2 overflow-x-auto px-4 pb-1">
-        <WelcomeCard discount={venue.welcome_discount} />
+      <WelcomeCard discount={venue.welcome_discount} />
+      <div className="grid grid-cols-4 gap-2">
         {TIER_ORDER.map((tier) => {
           const rank = TIER_RANK[tier];
           const relation: "lower" | "current" | "higher" =
@@ -689,18 +687,18 @@ function WelcomeCard({
   discount: VenueDetail["welcome_discount"];
 }) {
   return (
-    <div className="group bg-background relative w-36 shrink-0 snap-start overflow-hidden rounded-xl p-3">
+    <div className="group bg-background relative overflow-hidden rounded-xl p-4">
       <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-violet-500 via-pink-500 to-amber-400" />
       <p className="text-[10px] font-bold tracking-wider text-violet-400 uppercase">
         Welcome
       </p>
-      <p className="mt-1 flex items-baseline gap-1.5">
-        <span className="font-display text-foreground text-xl font-semibold">
+      <p className="mt-1 flex items-baseline gap-2">
+        <span className="font-display text-foreground text-3xl font-semibold">
           {discount.value}%
         </span>
-        <span className="text-muted-foreground text-xs">off</span>
+        <span className="text-muted-foreground text-sm">off</span>
       </p>
-      <p className="text-muted-foreground mt-0.5 text-[10px]">
+      <p className="text-muted-foreground mt-1 text-xs">
         {discount.subtitle}
       </p>
       <CardHoverAction label="Claim" variant="primary" />
@@ -719,24 +717,19 @@ function TierCard({
 }) {
   if (relation === "current") {
     return (
-      <div className="group bg-pink-gradient shadow-glow relative w-36 shrink-0 snap-start overflow-hidden rounded-xl p-3 text-white">
-        <span className="bg-white/95 absolute top-2 right-2 rounded-full px-1.5 py-0.5 text-[8px] font-bold tracking-wider text-zinc-900 uppercase">
-          Current
-        </span>
-        <p className="text-[10px] font-bold tracking-wider text-white/85 uppercase">
+      <div className="group bg-pink-gradient shadow-glow relative overflow-hidden rounded-xl p-2 text-center text-white">
+        <p className="text-[9px] font-bold tracking-wider text-white/90 uppercase">
           {TIER_PROPER[tier]}
         </p>
-        <p className="mt-1 flex items-baseline gap-1.5">
-          <span className="font-display text-xl font-semibold">{value}%</span>
-          <span className="text-xs text-white/85">off</span>
+        <p className="font-display mt-0.5 text-lg font-semibold leading-tight">
+          {value}%
         </p>
-        <p className="mt-0.5 text-[10px] text-white/75">on every visit</p>
-        <CardHoverAction label="Manage class" variant="light" />
+        <CardHoverAction label="Manage" variant="light" />
       </div>
     );
   }
   return (
-    <div className="group bg-background relative w-36 shrink-0 snap-start overflow-hidden rounded-xl p-3">
+    <div className="group bg-background relative overflow-hidden rounded-xl p-2 text-center">
       <div
         className={cn(
           "absolute inset-x-0 top-0 h-1",
@@ -745,23 +738,17 @@ function TierCard({
       />
       <p
         className={cn(
-          "text-[10px] font-bold tracking-wider uppercase",
+          "text-[9px] font-bold tracking-wider uppercase",
           TIER_TEXT[tier],
         )}
       >
         {TIER_PROPER[tier]}
       </p>
-      <p className="mt-1 flex items-baseline gap-1.5">
-        <span className="font-display text-foreground text-xl font-semibold">
-          {value}%
-        </span>
-        <span className="text-muted-foreground text-xs">off</span>
+      <p className="font-display text-foreground mt-0.5 text-lg font-semibold leading-tight">
+        {value}%
       </p>
       {relation === "higher" && (
-        <CardHoverAction
-          label={`Join ${TIER_PROPER[tier]}`}
-          variant="primary"
-        />
+        <CardHoverAction label={`Join`} variant="primary" />
       )}
     </div>
   );
